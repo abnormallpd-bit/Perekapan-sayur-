@@ -240,13 +240,13 @@
       <div class="stat"><div class="k">Jumlah Baris</div><div class="v">${records.length}</div></div>
     `;
 
-    recordCount.textContent = `${records.length} baris data tersimpan di bulan ${ym}. Menampilkan 20 data terakhir.`;
+    recordCount.textContent = `${records.length} baris data tersimpan di bulan ${ym}.`;
 
     const sorted = records.slice().sort((a,b)=>
       (b.date||"").localeCompare(a.date||"") ||
       (b.createdAt||"").localeCompare(a.createdAt||"")
     );
-    const recent = sorted.slice(0,20);
+    const recent = sorted.slice;
 
     recentTbody.innerHTML = "";
     for(const r of recent){
@@ -305,7 +305,13 @@
     allDetailTitle.textContent = `Rincian Kecamatan: ${activeDistrict}`;
     allDetailSub.textContent = `Menampilkan semua tanggal & semua sayur untuk ${activeDistrict} (bulan ${ym}).`;
 
-    const distRecords = records.filter(r=>r.district===activeDistrict);
+    const keyword = document.getElementById("searchSupplier")?.value?.toLowerCase() || "";
+
+    const distRecords = records.filter(r =>
+    r.district===activeDistrict &&
+    (r.supplier || "").toLowerCase().includes(keyword)
+);
+
 
     const t = totals(distRecords);
     allTotalsPill.textContent = `Total: ${fmtKg(t.kg)} kg → Rp ${fmtRp(t.rp)}`;
@@ -626,6 +632,11 @@
 
   // ===== Init =====
   function init(){
+    const searchSupplier = document.getElementById("searchSupplier");
+    if(searchSupplier){
+  searchSupplier.addEventListener("input", renderAllDistrictDetail);
+    }
+
     if(!guardDom()) return;
 
     rateLabel.textContent = `Rp ${fmtRp(RATE_PER_KG)}`;
