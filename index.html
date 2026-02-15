@@ -1,168 +1,147 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rekap Sayur Bulanan</title>
-
-  <link rel="stylesheet" href="styles.css" />
-
-  <!-- Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- PDF -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.29/dist/jspdf.plugin.autotable.min.js"></script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rekap Sayur Bulanan</title>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 
 <body>
 <div class="shell">
 
-  <!-- SIDEBAR -->
-  <aside class="side">
-    <div class="brand">
-      <div class="logo">🥬</div>
-      <div>
-        <div class="brandTitle">Rekap Sayur</div>
-        <div class="brandSub">Bulanan</div>
-      </div>
+<aside class="side">
+  <div class="brand">
+    <div class="logo">🥬</div>
+    <div>
+      <div class="brandTitle">Rekap Sayur</div>
+      <div class="brandSub">Bulanan</div>
     </div>
+  </div>
 
-    <nav class="menu">
-      <button class="menuBtn active" data-page="pageDashboard">Beranda / Input</button>
-      <button class="menuBtn" data-page="pageAll">Semua Data</button>
-      <button class="menuBtn" data-page="pageExport">Export</button>
-    </nav>
+  <nav class="menu">
+    <button class="menuBtn active" data-page="pageDashboard">Beranda / Input</button>
+    <button class="menuBtn" data-page="pageAll">Semua Data</button>
+  </nav>
 
-    <div class="sideFoot">
-      <div class="pill">Tarif: <b>Rp 300</b> / Kg</div>
-      <div class="muted small">Data tersimpan di browser</div>
-    </div>
-  </aside>
+  <div class="sideFoot">
+    <div class="pill">Tarif: Rp 300 / Kg</div>
+  </div>
+</aside>
 
-  <!-- MAIN -->
-  <main class="main">
-    <header class="top">
-      <div>
-        <div class="title">Rekap Sayur Bulanan</div>
-        <div class="subtitle muted">Draft → Simpan → Rekap Final</div>
-      </div>
-    </header>
+<main class="main">
+<header class="top">
+  <div>
+    <div class="title">Rekap Sayur Bulanan</div>
+    <div class="subtitle muted">Draft → Simpan → Rekap Final</div>
+  </div>
+</header>
 
-    <section class="wrap">
+<section class="wrap">
 
-      <!-- DASHBOARD -->
-      <section id="pageDashboard" class="page active">
+<!-- DASHBOARD -->
+<section id="pageDashboard" class="page active">
 
-        <div class="grid2">
-          <div class="card">
-            <div class="h2">Pengaturan Bulan & Tanggal</div>
-            <div class="row">
-              <label>Bulan</label>
-              <input id="monthInput" type="month" />
-            </div>
-            <div class="row">
-              <label>Tanggal</label>
-              <input id="dateInput" type="date" />
-            </div>
-          </div>
+<div class="grid2">
+<div class="card">
+<div class="h2">Pengaturan</div>
 
-          <div class="card">
-            <div class="h2">Input Data Pesanan</div>
-            <div class="row">
-              <label>Nama Sayur</label>
-              <input id="vegInput" type="text" />
-            </div>
-            <div class="row">
-              <label>Supplier</label>
-              <select id="supplierInput"></select>
-            </div>
-            <div class="row">
-              <label>Kecamatan</label>
-              <select id="districtInput"></select>
-            </div>
-            <div class="row">
-              <label>Kg</label>
-              <input id="kgOrderInput" type="number" step="0.01" />
-            </div>
-            <div class="actions">
-              <button id="btnAdd" class="primary">Tambah</button>
-              <button id="btnReset" class="ghost">Reset</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <div class="h2">Ringkasan Bulan Ini</div>
-          <div id="stats" class="stats"></div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <div class="split">
-            <div>
-              <div class="h2">Data Bulan Ini (Draft)</div>
-              <div class="muted small" id="recordCount"></div>
-            </div>
-            <div class="actions">
-              <button id="btnSaveMonth" class="primary">Simpan Data Bulan Ini</button>
-              <button id="btnClearMonth" class="danger">Hapus Draft</button>
-            </div>
-          </div>
-
-          <div class="tableWrap">
-            <table id="recentTable">
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>Sayur</th>
-                  <th>Supplier</th>
-                  <th>Kecamatan</th>
-                  <th class="num">Kg</th>
-                  <th class="num">Nominal</th>
-                  <th class="num">Aksi</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- SEMUA DATA -->
-      <section id="pageAll" class="page">
-        <div class="card">
-          <div class="h2">Semua Data (Final)</div>
-          <div class="tableWrap">
-            <table id="allTable">
-              <thead>
-                <tr>
-                  <th>Bulan</th>
-                  <th>Tanggal</th>
-                  <th>Sayur</th>
-                  <th>Supplier</th>
-                  <th>Kecamatan</th>
-                  <th class="num">Kg</th>
-                  <th class="num">Nominal</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- EXPORT -->
-      <section id="pageExport" class="page">
-        <div class="card">
-          <div class="h2">Export</div>
-          <button id="btnExportExcel">Export Excel</button>
-        </div>
-      </section>
-
-    </section>
-  </main>
+<div class="row">
+<label>Bulan</label>
+<input id="monthInput" type="month"/>
 </div>
 
-<script src="app.js?v=final"></script>
+<div class="row">
+<label>Tanggal</label>
+<input id="dateInput" type="date"/>
+</div>
+</div>
+
+<div class="card">
+<div class="h2">Input Pesanan</div>
+
+<div class="row">
+<label>Sayur</label>
+<input id="vegInput" type="text"/>
+</div>
+
+<div class="row">
+<label>Supplier</label>
+<select id="supplierInput"></select>
+</div>
+
+<div class="row">
+<label>Kecamatan</label>
+<select id="districtInput"></select>
+</div>
+
+<div class="row">
+<label>Kg</label>
+<input id="kgInput" type="number" step="0.01"/>
+</div>
+
+<div class="actions">
+<button id="btnAdd" class="primary">Tambah</button>
+<button id="btnSaveMonth">Simpan Bulan Ini</button>
+</div>
+
+</div>
+</div>
+
+<div class="card" style="margin-top:14px;">
+<div class="h2">Data Bulan Ini (Draft)</div>
+<div id="draftInfo" class="muted small"></div>
+
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Sayur</th>
+<th>Supplier</th>
+<th>Kecamatan</th>
+<th class="num">Kg</th>
+<th class="num">Nominal</th>
+<th></th>
+</tr>
+</thead>
+<tbody id="draftTable"></tbody>
+</table>
+</div>
+</div>
+
+</section>
+
+<!-- SEMUA DATA -->
+<section id="pageAll" class="page">
+<div class="card">
+<div class="h2">Semua Data (Final)</div>
+
+<div id="districtButtons" class="chipRow"></div>
+<div id="finalTotal" class="pill" style="margin:10px 0;">Pilih kecamatan</div>
+
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Sayur</th>
+<th>Supplier</th>
+<th>Kecamatan</th>
+<th class="num">Kg</th>
+<th class="num">Nominal</th>
+</tr>
+</thead>
+<tbody id="finalTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+</section>
+</main>
+</div>
+
+<script src="app.js?v=cleanfinal1"></script>
 </body>
 </html>
