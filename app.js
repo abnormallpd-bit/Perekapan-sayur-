@@ -246,7 +246,7 @@
       (b.date||"").localeCompare(a.date||"") ||
       (b.createdAt||"").localeCompare(a.createdAt||"")
     );
-    const recent = sorted.slice;
+    const recent = sorted.slice; //tampilkan semua, tanpa limit
 
     recentTbody.innerHTML = "";
     for(const r of recent){
@@ -685,3 +685,4 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
