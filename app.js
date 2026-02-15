@@ -27,6 +27,22 @@
   const lockKey  = (ym)=> `rekap_sayur_final5_lock:${ym}`;
 
   function loadMonth(ym){
+    // ===== DRAFT (Data Bulan Ini) =====
+  function loadDraft(ym){
+    return JSON.parse(localStorage.getItem(`rekap_draft:${ym}`) || "[]");
+  }
+  function saveDraft(ym, records){
+    localStorage.setItem(`rekap_draft:${ym}`, JSON.stringify(records));
+  }
+
+  // ===== FINAL (Semua Data) =====
+  function loadFinal(){
+    return JSON.parse(localStorage.getItem("rekap_final") || "[]");
+  }
+  function saveFinal(records){
+    localStorage.setItem("rekap_final", JSON.stringify(records));
+  }
+
     const raw = localStorage.getItem(monthKey(ym));
     try{ return raw ? JSON.parse(raw) : []; }catch{ return []; }
   }
@@ -230,7 +246,7 @@
 
   function renderDashboard(){
     const ym = monthInput.value || getDefaultMonth();
-    const records = loadMonth(ym);
+    const records = loadDraft(ym);
 
     const t = totals(records);
     stats.innerHTML = `
@@ -246,7 +262,7 @@
       (b.date||"").localeCompare(a.date||"") ||
       (b.createdAt||"").localeCompare(a.createdAt||"")
     );
-    const recent = sorted.slice; //tampilkan semua, tanpa limit
+    const recent = sorted.slice;
 
     recentTbody.innerHTML = "";
     for(const r of recent){
@@ -299,7 +315,7 @@
 
   function renderAllDistrictDetail(){
     const ym = monthInput.value || getDefaultMonth();
-    const records = loadMonth(ym);
+    const records = loadFinal().filter(r => r.month === ym);
 
     allHeaderPill.textContent = `Bulan aktif: ${ym}`;
     allDetailTitle.textContent = `Rincian Kecamatan: ${activeDistrict}`;
@@ -380,34 +396,56 @@
 
   // ===== CRUD =====
   function addRecord(){
-    const err = validateInput();
-    if(err) return setMessage(err, "warn");
+    function saveMonthFinal(){
+  const ym = monthInput.value;
+  if(!ym) return;
 
-    const ym = monthInput.value;
-    const records = loadMonth(ym);
-
-    const district = districtInput.value;
-
-    records.push({
-      id: uid(),
-      date: dateInput.value,
-      district,
-      veg: normalizeVeg(vegInput.value),
-      supplier: supplierInput.value,
-      kg: Number(kgOrderInput.value),
-      createdAt: new Date().toISOString()
-    });
-
-    saveMonth(ym, records);
-    setMessage("Data ditambahkan.", "good");
-
-    activeDistrict = district;
-    renderAll();
-
-    vegInput.value = "";
-    kgOrderInput.value = "";
-    vegInput.focus();
+  const draft = loadDraft(ym);
+  if(draft.length === 0){
+    alert("Tidak ada data untuk disimpan.");
+    return;
   }
+
+  const final = loadFinal();
+
+  draft.forEach(d => {
+    final.push({
+      ...d,
+      month: ym
+    });
+  });
+
+  saveFinal(final);
+  localStorage.removeItem(`rekap_draft:${ym}`);
+
+  alert(`Data bulan ${ym} disimpan ke Semua Data.`);
+  renderAll();
+}
+
+  const err = validateInput();
+  if(err) return setMessage(err, "warn");
+
+  const ym = monthInput.value;
+  const draft = loadDraft(ym);
+
+  draft.push({
+    id: uid(),
+    date: dateInput.value,
+    veg: normalizeVeg(vegInput.value),
+    supplier: supplierInput.value,
+    district: districtInput.value,
+    kg: Number(kgOrderInput.value)
+  });
+
+  saveDraft(ym, draft);
+  setMessage("Data ditambahkan (DRAFT).", "good");
+
+  renderAll();
+
+  vegInput.value = "";
+  kgOrderInput.value = "";
+  vegInput.focus();
+}
 
   function resetForm(){
     vegInput.value = "";
@@ -669,6 +707,11 @@
     btnReset.addEventListener("click", resetForm);
     btnClearMonth.addEventListener("click", clearMonth);
 
+    const btnSaveMonth = document.getElementById("btnSaveMonth");
+    if(btnSaveMonth){
+    btnSaveMonth.addEventListener("click", saveMonthFinal);
+    }
+
     btnLockMonth.addEventListener("click", lockMonth);
     btnUnlockMonth.addEventListener("click", unlockMonth);
 
@@ -685,4 +728,3 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
-
