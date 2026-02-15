@@ -277,3 +277,15 @@ tbody tr:hover{background:rgba(43,59,122,0.18)}
   .statusBar{flex-direction:column}
   .statusRight{min-width:unset; width:100%}
 }
+/* admin pill */
+#adminPill{
+  border-color: rgba(245,158,11,0.4);
+}
+#adminPill.on{
+  border-color: rgba(52,211,153,0.7);
+  box-shadow: 0 0 0 2px rgba(52,211,153,0.12) inset;
+}
+#adminPill{
+  border-color: rgba(245,158,11,0.4);
+}
+
