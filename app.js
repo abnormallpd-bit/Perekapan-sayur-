@@ -1,5 +1,6 @@
 (() => {
   // ================= CONFIG =================
+  console.log("APP FINAL LOADED");
   const DISTRICTS = ["krai", "bades", "kunir", "wonorejo", "randuagung", "petahunan"];
   const SUPPLIERS = [
     "ud kabinet maju bersama",
@@ -219,3 +220,4 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
