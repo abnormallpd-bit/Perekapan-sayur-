@@ -1,223 +1,133 @@
 (() => {
-  // ================= CONFIG =================
-  console.log("APP FINAL LOADED");
-  const DISTRICTS = ["krai", "bades", "kunir", "wonorejo", "randuagung", "petahunan"];
-  const SUPPLIERS = [
-    "ud kabinet maju bersama",
-    "rasyad sayur",
-    "ud bah karim",
-    "aneka sayur",
-    "ifan sayur",
-  ];
-  const RATE_PER_KG = 300;
+  const RATE = 300;
+  const SUPPLIERS = ["ud kabinet maju bersama","rasyad sayur","ud bah karim","aneka sayur","ifan sayur"];
+  const DISTRICTS = ["krai","bades","kunir","wonorejo","randuagung","petahunan"];
 
-  // ================= HELPERS =================
-  const pad2 = n => String(n).padStart(2, "0");
-  const uid = () => `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-  const fmtKg = x => Number.isFinite(x) ? x.toFixed(2) : "0.00";
-  const fmtRp = x => Math.round(x || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  const normalizeVeg = s => (s || "").trim().replace(/\s+/g, " ");
-  const escapeHtml = s => String(s ?? "")
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  const $ = id => document.getElementById(id);
+  const uid = () => Date.now()+"_"+Math.random().toString(16).slice(2);
 
-  function totals(records){
-    let kg = 0;
-    records.forEach(r => kg += Number(r.kg) || 0);
-    return { kg, rp: kg * RATE_PER_KG };
+  const loadDraft = ym => JSON.parse(localStorage.getItem("draft:"+ym) || "[]");
+  const saveDraft = (ym,d) => localStorage.setItem("draft:"+ym, JSON.stringify(d));
+  const loadFinal = () => JSON.parse(localStorage.getItem("final") || "[]");
+  const saveFinal = d => localStorage.setItem("final", JSON.stringify(d));
+
+  function totals(arr){
+    const kg = arr.reduce((s,r)=>s+Number(r.kg||0),0);
+    return {kg, rp:kg*RATE};
   }
 
-  // ================= STORAGE =================
-  function loadDraft(ym){
-    return JSON.parse(localStorage.getItem(`rekap_draft:${ym}`) || "[]");
-  }
-  function saveDraft(ym, records){
-    localStorage.setItem(`rekap_draft:${ym}`, JSON.stringify(records));
-  }
-
-  function loadFinal(){
-    return JSON.parse(localStorage.getItem("rekap_final") || "[]");
-  }
-  function saveFinal(records){
-    localStorage.setItem("rekap_final", JSON.stringify(records));
-  }
-
-  // ================= DOM =================
-  const monthInput = document.getElementById("monthInput");
-  const dateInput = document.getElementById("dateInput");
-  const vegInput = document.getElementById("vegInput");
-  const supplierInput = document.getElementById("supplierInput");
-  const districtInput = document.getElementById("districtInput");
-  const kgOrderInput = document.getElementById("kgOrderInput");
-
-  const btnAdd = document.getElementById("btnAdd");
-  const btnReset = document.getElementById("btnReset");
-  const btnSaveMonth = document.getElementById("btnSaveMonth");
-  const btnClearMonth = document.getElementById("btnClearMonth");
-
-  const stats = document.getElementById("stats");
-  const recordCount = document.getElementById("recordCount");
-  const recentTbody = document.querySelector("#recentTable tbody");
-
-  const districtButtons = document.getElementById("districtButtons");
-  const allTotalsPill = document.getElementById("allTotalsPill");
-  const vegSummaryTbody = document.querySelector("#vegSummaryTable tbody");
-  const dateVegTbody = document.querySelector("#dateVegTable tbody");
-
-  // ================= DEFAULT =================
-  function getDefaultMonth(){
-    const d = new Date();
-    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
-  }
-
-  function getDefaultDate(){
-    const d = new Date();
-    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  }
-
-  // ================= RENDER DASHBOARD (DRAFT) =================
   function renderDashboard(){
-    const ym = monthInput.value;
-    const records = loadDraft(ym);
-    const t = totals(records);
+    const ym = $("monthInput").value;
+    const data = loadDraft(ym);
+    const t = totals(data);
 
-    stats.innerHTML = `
-      <div class="stat"><div class="k">Total Kg</div><div class="v">${fmtKg(t.kg)}</div></div>
-      <div class="stat"><div class="k">Total Rp</div><div class="v">Rp ${fmtRp(t.rp)}</div></div>
-      <div class="stat"><div class="k">Tarif</div><div class="v">Rp ${fmtRp(RATE_PER_KG)}/Kg</div></div>
-      <div class="stat"><div class="k">Jumlah Baris</div><div class="v">${records.length}</div></div>
+    $("stats").innerHTML = `
+      <div class="stat"><div class="k">Total Kg</div><div class="v">${t.kg.toFixed(2)}</div></div>
+      <div class="stat"><div class="k">Total Rp</div><div class="v">Rp ${t.rp.toLocaleString()}</div></div>
+      <div class="stat"><div class="k">Tarif</div><div class="v">Rp ${RATE}/Kg</div></div>
+      <div class="stat"><div class="k">Jumlah Baris</div><div class="v">${data.length}</div></div>
     `;
 
-    recordCount.textContent =
-      records.length === 0
-        ? `Belum ada data draft bulan ${ym}.`
-        : `${records.length} data draft bulan ${ym}.`;
+    $("recordCount").textContent =
+      data.length ? `${data.length} data draft` : "Belum ada data";
 
-    recentTbody.innerHTML = "";
-    records.forEach(r => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${r.date}</td>
-        <td>${escapeHtml(r.veg)}</td>
-        <td>${escapeHtml(r.supplier)}</td>
-        <td>${escapeHtml(r.district)}</td>
-        <td class="num">${fmtKg(r.kg)}</td>
-        <td class="num">Rp ${fmtRp(r.kg * RATE_PER_KG)}</td>
-        <td class="num">
-          <button class="danger" data-id="${r.id}">🗑</button>
-        </td>
-      `;
-      recentTbody.appendChild(tr);
+    const tb = $("recentTable").querySelector("tbody");
+    tb.innerHTML = "";
+    data.forEach(r=>{
+      tb.innerHTML += `
+        <tr>
+          <td>${r.date}</td>
+          <td>${r.veg}</td>
+          <td>${r.supplier}</td>
+          <td>${r.district}</td>
+          <td class="num">${r.kg}</td>
+          <td class="num">Rp ${(r.kg*RATE).toLocaleString()}</td>
+          <td class="num"><button data-id="${r.id}">🗑</button></td>
+        </tr>`;
     });
 
-    recentTbody.onclick = e => {
-      const btn = e.target.closest("button");
-      if(!btn) return;
-      deleteDraft(btn.dataset.id);
+    tb.onclick = e=>{
+      if(!e.target.dataset.id) return;
+      saveDraft(ym, data.filter(x=>x.id!==e.target.dataset.id));
+      renderAll();
     };
   }
 
-  // ================= CRUD DRAFT =================
-  function addRecord(){
-    const ym = monthInput.value;
-    const records = loadDraft(ym);
-
-    records.push({
-      id: uid(),
-      date: dateInput.value,
-      veg: normalizeVeg(vegInput.value),
-      supplier: supplierInput.value,
-      district: districtInput.value,
-      kg: Number(kgOrderInput.value)
-    });
-
-    saveDraft(ym, records);
-    renderAll();
-    vegInput.value = "";
-    kgOrderInput.value = "";
-  }
-
-  function deleteDraft(id){
-    const ym = monthInput.value;
-    const records = loadDraft(ym).filter(r => r.id !== id);
-    saveDraft(ym, records);
-    renderAll();
-  }
-
-  function saveMonthFinal(){
-    const ym = monthInput.value;
-    const draft = loadDraft(ym);
-    if(draft.length === 0) return alert("Draft kosong.");
-
-    const final = loadFinal();
-    draft.forEach(d => final.push({ ...d, month: ym }));
-    saveFinal(final);
-    localStorage.removeItem(`rekap_draft:${ym}`);
-
-    alert(`Data bulan ${ym} disimpan.`);
-    renderAll();
-  }
-
-  function clearDraft(){
-    const ym = monthInput.value;
-    if(confirm(`Hapus draft bulan ${ym}?`)){
-      localStorage.removeItem(`rekap_draft:${ym}`);
-      renderAll();
-    }
-  }
-
-  // ================= RENDER FINAL =================
-  function renderAllDistrictDetail(){
-    const ym = monthInput.value;
-    const records = loadFinal().filter(r => r.month === ym);
-    const t = totals(records);
-    allTotalsPill.textContent = `Total: ${fmtKg(t.kg)} kg → Rp ${fmtRp(t.rp)}`;
-
-    vegSummaryTbody.innerHTML = "";
-    dateVegTbody.innerHTML = "";
-
-    records.forEach(r => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${r.date}</td>
-        <td>${escapeHtml(r.veg)}</td>
-        <td>${escapeHtml(r.supplier)}</td>
-        <td class="num">${fmtKg(r.kg)}</td>
-        <td class="num">Rp ${fmtRp(r.kg * RATE_PER_KG)}</td>
-      `;
-      dateVegTbody.appendChild(tr);
+  function renderAllData(){
+    const tb = $("allTable").querySelector("tbody");
+    tb.innerHTML = "";
+    loadFinal().forEach(r=>{
+      tb.innerHTML += `
+        <tr>
+          <td>${r.month}</td>
+          <td>${r.date}</td>
+          <td>${r.veg}</td>
+          <td>${r.supplier}</td>
+          <td>${r.district}</td>
+          <td class="num">${r.kg}</td>
+          <td class="num">Rp ${(r.kg*RATE).toLocaleString()}</td>
+        </tr>`;
     });
   }
 
   function renderAll(){
     renderDashboard();
-    renderAllDistrictDetail();
+    renderAllData();
   }
 
-  // ================= INIT =================
   function init(){
-    monthInput.value = getDefaultMonth();
-    dateInput.value = getDefaultDate();
+    const d=new Date();
+    $("monthInput").value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+    $("dateInput").value=d.toISOString().slice(0,10);
 
-    SUPPLIERS.forEach(s => {
-      const o = document.createElement("option");
-      o.value = s; o.textContent = s;
-      supplierInput.appendChild(o);
-    });
-    DISTRICTS.forEach(d => {
-      const o = document.createElement("option");
-      o.value = d; o.textContent = d;
-      districtInput.appendChild(o);
-    });
+    SUPPLIERS.forEach(s=>$("supplierInput").append(new Option(s,s)));
+    DISTRICTS.forEach(d=>$("districtInput").append(new Option(d,d)));
 
-    btnAdd.onclick = addRecord;
-    btnReset.onclick = () => { vegInput.value=""; kgOrderInput.value=""; };
-    btnSaveMonth.onclick = saveMonthFinal;
-    btnClearMonth.onclick = clearDraft;
+    $("btnAdd").onclick=()=>{
+      const ym=$("monthInput").value;
+      const data=loadDraft(ym);
+      data.push({
+        id:uid(),
+        date:$("dateInput").value,
+        veg:$("vegInput").value,
+        supplier:$("supplierInput").value,
+        district:$("districtInput").value,
+        kg:Number($("kgOrderInput").value)
+      });
+      saveDraft(ym,data);
+      renderAll();
+    };
+
+    $("btnSaveMonth").onclick=()=>{
+      const ym=$("monthInput").value;
+      const draft=loadDraft(ym);
+      if(!draft.length) return alert("Draft kosong");
+      const final=loadFinal();
+      draft.forEach(d=>final.push({...d,month:ym}));
+      saveFinal(final);
+      localStorage.removeItem("draft:"+ym);
+      renderAll();
+    };
+
+    $("btnClearMonth").onclick=()=>{
+      if(confirm("Hapus draft?")){
+        localStorage.removeItem("draft:"+$("monthInput").value);
+        renderAll();
+      }
+    };
+
+    // NAV
+    document.querySelectorAll(".menuBtn").forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll(".menuBtn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+        document.getElementById(btn.dataset.page).classList.add("active");
+      };
+    });
 
     renderAll();
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded",init);
 })();
-
