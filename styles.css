@@ -220,11 +220,7 @@ th, td{padding:11px; border-bottom:1px solid var(--line); font-size:14px}
 th{background:rgba(11,18,48,0.85); position:sticky; top:0; text-align:left}
 td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
 tbody tr:hover{background:rgba(43,59,122,0.18)}
-
-/* khusus pageAll biar tabel kanan gak maksa lebar */
-#pageAll .tableWrap table{
-  min-width: 520px;
-}
+#pageAll .tableWrap table{min-width:520px}
 
 /* Stats */
 .stats{
@@ -245,7 +241,32 @@ tbody tr:hover{background:rgba(43,59,122,0.18)}
 .page{display:none}
 .page.active{display:block}
 
-/* Responsive */
+/* Modal */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:99;
+}
+.modalBox{
+  width:min(720px, 92vw);
+  background:rgba(18,26,51,0.97);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+.modalTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
 @media (max-width: 1050px){
   .grid2{grid-template-columns:1fr}
   .twoCols{grid-template-columns:1fr}
