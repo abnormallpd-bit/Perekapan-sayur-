@@ -44,7 +44,7 @@
         <div>
           <div class="title">Rekap Sayur Bulanan</div>
           <div class="subtitle muted">
-            Isi bulan & tanggal di Beranda/Input → input pesanan → Semua Data tinggal klik kecamatan.
+            Isi bulan & tanggal → input pesanan → Semua Data tinggal klik kecamatan.
           </div>
         </div>
 
@@ -151,6 +151,7 @@
                     <th>Kecamatan</th>
                     <th class="num">Kg</th>
                     <th class="num">Nominal (Kg×300)</th>
+                    <th class="num">Aksi</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -245,6 +246,48 @@
     </main>
   </div>
 
-  <script src="app.js"></script>
+  <!-- MODAL EDIT -->
+  <div id="editModal" class="modal" style="display:none;">
+    <div class="modalBox">
+      <div class="modalTop">
+        <div class="h2" style="margin:0;">Edit Data</div>
+        <button id="btnCloseModal" class="ghost">Tutup</button>
+      </div>
+
+      <div class="row">
+        <label>Tanggal</label>
+        <input id="editDate" type="date" />
+      </div>
+
+      <div class="row">
+        <label>Nama Sayur</label>
+        <input id="editVeg" type="text" />
+      </div>
+
+      <div class="row">
+        <label>Supplier</label>
+        <select id="editSupplier"></select>
+      </div>
+
+      <div class="row">
+        <label>Kecamatan</label>
+        <select id="editDistrict"></select>
+      </div>
+
+      <div class="row">
+        <label>Kg</label>
+        <input id="editKg" type="number" step="0.01" min="0" />
+      </div>
+
+      <div class="actions" style="justify-content:flex-end; margin-top:12px;">
+        <button id="btnSaveEdit" class="primary">Simpan Perubahan</button>
+      </div>
+
+      <div id="editInfo" class="info muted" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- cache-bust biar GitHub Pages nggak pake JS lama -->
+  <script src="app.js?v=final5"></script>
 </body>
 </html>
