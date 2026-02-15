@@ -1,0 +1,258 @@
+:root{
+  --bg:#0b1020;
+  --text:#eef1ff;
+  --muted:#b6bee2;
+  --line:#2b3560;
+  --good:#34d399;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+  --btn:#1f2a52;
+  --btn2:#22305f;
+  --accent:#2b3b7a;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:radial-gradient(900px 500px at 20% 10%, rgba(43,59,122,0.35), transparent 55%),
+             radial-gradient(900px 600px at 80% 0%, rgba(52,211,153,0.12), transparent 60%),
+             linear-gradient(180deg,var(--bg),#070a14);
+  color:var(--text);
+  font-size:16px;
+  line-height:1.35;
+}
+
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+.shell{display:flex; min-height:100vh}
+
+/* Sidebar */
+.side{
+  width:270px;
+  padding:14px;
+  border-right:1px solid var(--line);
+  background:rgba(10,16,34,0.9);
+  position:sticky; top:0; height:100vh;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  padding:10px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(18,26,51,0.9);
+  box-shadow:0 12px 30px rgba(0,0,0,0.35);
+}
+.logo{
+  width:46px;height:46px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:14px;
+  background:rgba(43,59,122,0.35);
+  border:1px solid var(--line);
+  font-size:24px;
+}
+.brandTitle{font-weight:900}
+.brandSub{font-size:13px;color:var(--muted)}
+
+.menu{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+.menuBtn{
+  text-align:left;
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(12,19,48,0.5);
+  color:var(--text);
+  cursor:pointer;
+  font-size:15px;
+}
+.menuBtn:hover{background:rgba(31,42,82,0.55)}
+.menuBtn.active{
+  background:rgba(43,59,122,0.55);
+  border-color:rgba(43,59,122,0.95);
+}
+
+.sideFoot{margin-top:14px; padding:10px; border-radius:14px; border:1px dashed var(--line); background:rgba(12,19,48,0.35)}
+.pill{
+  display:inline-block;
+  padding:9px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(12,19,48,0.65);
+  font-size:14px;
+}
+
+/* Main */
+.main{flex:1; display:flex; flex-direction:column}
+.top{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+  background:rgba(11,16,32,0.75);
+  position:sticky; top:0; z-index:2;
+  backdrop-filter: blur(10px);
+}
+.title{font-size:20px;font-weight:950}
+.subtitle{font-size:14px}
+
+.wrap{
+  max-width:none;
+  width:100%;
+  margin:0;
+  padding:18px 22px;
+}
+
+/* Cards */
+.card{
+  background:rgba(18,26,51,0.92);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 14px 34px rgba(0,0,0,0.38);
+}
+.card.inner{
+  background:rgba(12,19,48,0.55);
+  box-shadow:none;
+}
+.h2{font-size:18px; font-weight:900; margin-bottom:10px}
+.h3{font-size:16px; font-weight:900; margin:8px 0}
+
+.statusBar{display:flex; gap:12px; justify-content:space-between; align-items:flex-start}
+.statusLeft{flex:1}
+.statusRight{min-width:340px}
+
+/* Forms */
+.row{
+  display:grid;
+  grid-template-columns: 150px 1fr;
+  gap:10px;
+  align-items:center;
+  margin:10px 0;
+}
+label{font-size:14px;color:var(--muted)}
+input, select{
+  width:100%;
+  padding:11px 11px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#0c1330;
+  color:var(--text);
+  font-size:15px;
+}
+button{
+  padding:11px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--btn);
+  color:var(--text);
+  cursor:pointer;
+  font-size:15px;
+}
+button:hover{background:var(--btn2)}
+.primary{background:var(--accent)}
+.primary:hover{background:#34458a}
+.ghost{background:transparent}
+.warn{border-color:#7c5a12;background:rgba(245,158,11,0.15)}
+.danger{border-color:#7c1d1d;background:rgba(239,68,68,0.12)}
+
+.info{
+  padding:11px;
+  border-radius:14px;
+  background:rgba(31,42,82,0.30);
+  border:1px solid var(--line);
+  font-size:14px;
+}
+.tip{
+  margin-top:10px;
+  padding:11px;
+  border-radius:14px;
+  border:1px dashed var(--line);
+  background:rgba(12,19,48,0.35);
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* Layout blocks */
+.grid2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+}
+.twoCols{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+}
+.split{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap}
+.actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+
+/* Chip row */
+.chipRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.chip{
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(12,19,48,0.55);
+  cursor:pointer;
+  font-weight:900;
+}
+.chip:hover{background:rgba(31,42,82,0.55)}
+.chip.active{
+  border-color:rgba(52,211,153,0.85);
+  box-shadow:0 0 0 2px rgba(52,211,153,0.15) inset;
+}
+
+/* Tables */
+.tableWrap{
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(12,19,48,0.45)
+}
+table{width:100%; border-collapse:collapse; min-width:680px}
+th, td{padding:11px; border-bottom:1px solid var(--line); font-size:14px}
+th{background:rgba(11,18,48,0.85); position:sticky; top:0; text-align:left}
+td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+tbody tr:hover{background:rgba(43,59,122,0.18)}
+
+/* khusus pageAll biar tabel kanan gak maksa lebar */
+#pageAll .tableWrap table{
+  min-width: 520px;
+}
+
+/* Stats */
+.stats{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:10px;
+}
+.stat{
+  padding:11px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(12,19,48,0.55);
+}
+.stat .k{color:var(--muted);font-size:13px}
+.stat .v{font-size:18px;margin-top:4px;font-weight:950}
+
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+
+/* Responsive */
+@media (max-width: 1050px){
+  .grid2{grid-template-columns:1fr}
+  .twoCols{grid-template-columns:1fr}
+  table{min-width:720px}
+}
+@media (max-width: 900px){
+  .side{display:none}
+  .statusBar{flex-direction:column}
+  .statusRight{min-width:unset; width:100%}
+}

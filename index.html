@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rekap Sayur Bulanan</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.29/dist/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="side">
+      <div class="brand">
+        <div class="logo">🥬</div>
+        <div>
+          <div class="brandTitle">Rekap Sayur</div>
+          <div class="brandSub">Bulanan</div>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <button class="menuBtn active" data-page="pageDashboard">Beranda / Input</button>
+        <button class="menuBtn" data-page="pageAll">Semua Data</button>
+        <button class="menuBtn" data-page="pageExport">Export</button>
+      </nav>
+
+      <div class="sideFoot">
+        <div class="pill">Tarif: <b id="rateLabel">Rp 300</b> / Kg</div>
+        <div class="muted small">Data tersimpan di browser (localStorage).</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="top">
+        <div>
+          <div class="title">Rekap Sayur Bulanan</div>
+          <div class="subtitle muted">
+            Isi bulan & tanggal di Beranda/Input → input pesanan → Semua Data tinggal klik kecamatan.
+          </div>
+        </div>
+
+        <div class="pill" id="globalStatusPill">—</div>
+      </header>
+
+      <section class="wrap">
+
+        <!-- BERANDA / INPUT -->
+        <section id="pageDashboard" class="page active">
+
+          <div class="grid2">
+            <div class="card">
+              <div class="h2">Pengaturan Bulan & Tanggal</div>
+
+              <div class="row">
+                <label>Bulan</label>
+                <input id="monthInput" type="month" />
+              </div>
+
+              <div class="row">
+                <label>Tanggal</label>
+                <input id="dateInput" type="date" />
+              </div>
+
+              <div class="row">
+                <label>Status Bulan</label>
+                <div class="info" id="monthStatus"></div>
+              </div>
+
+              <div class="actions">
+                <button id="btnLockMonth" class="warn">Kunci Bulan</button>
+                <button id="btnUnlockMonth" class="ghost">Buka Kunci</button>
+              </div>
+
+              <div class="tip">
+                <b>Catatan:</b> Tanggal harus sesuai bulan yang dipilih.
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h2">Input Data Pesanan</div>
+
+              <div class="row">
+                <label>Nama Sayur</label>
+                <input id="vegInput" type="text" placeholder="contoh: Kangkung" />
+              </div>
+
+              <div class="row">
+                <label>Nama Supplier</label>
+                <select id="supplierInput"></select>
+              </div>
+
+              <div class="row">
+                <label>Kecamatan</label>
+                <select id="districtInput"></select>
+              </div>
+
+              <div class="row">
+                <label>Kg Pesan</label>
+                <input id="kgOrderInput" type="number" step="0.01" min="0" placeholder="contoh: 12.5" />
+              </div>
+
+              <div class="actions">
+                <button id="btnAdd" class="primary">Tambah</button>
+                <button id="btnReset" class="ghost">Reset</button>
+              </div>
+
+              <div id="formInfo" class="info muted"></div>
+            </div>
+          </div>
+
+          <div class="statusBar card" style="margin-top:14px;">
+            <div class="statusLeft">
+              <div class="h2">Ringkasan Bulan Ini</div>
+              <div id="stats" class="stats"></div>
+            </div>
+            <div class="statusRight">
+              <div class="h2">Info</div>
+              <div class="info">
+                Untuk lihat rekap per kecamatan: buka menu <b>Semua Data</b> lalu klik kecamatannya.
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px;">
+            <div class="split">
+              <div>
+                <div class="h2">Data Bulan Ini (Terbaru)</div>
+                <div class="muted small" id="recordCount"></div>
+              </div>
+              <div class="actions">
+                <button id="btnClearMonth" class="danger">Hapus Data Bulan Ini</button>
+              </div>
+            </div>
+
+            <div class="tableWrap">
+              <table id="recentTable">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Sayur</th>
+                    <th>Supplier</th>
+                    <th>Kecamatan</th>
+                    <th class="num">Kg</th>
+                    <th class="num">Nominal (Kg×300)</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- SEMUA DATA -->
+        <section id="pageAll" class="page">
+          <div class="card">
+            <div class="split">
+              <div>
+                <div class="h2">Semua Data (Klik Kecamatan)</div>
+                <div class="muted">
+                  Klik kecamatan → langsung tampil semua tanggal & semua jenis sayur + total kg & nominal.
+                </div>
+              </div>
+              <div class="pill" id="allHeaderPill">—</div>
+            </div>
+
+            <div id="districtButtons" class="chipRow"></div>
+
+            <div class="card inner" style="margin-top:12px;">
+              <div class="split">
+                <div>
+                  <div class="h3" id="allDetailTitle">Rincian Kecamatan</div>
+                  <div class="muted small" id="allDetailSub">Pilih kecamatan.</div>
+                </div>
+                <div class="pill" id="allTotalsPill">—</div>
+              </div>
+
+              <div class="twoCols" style="margin-top:10px;">
+                <div>
+                  <div class="h3">Ringkasan per Sayur (Total)</div>
+                  <div class="tableWrap">
+                    <table id="vegSummaryTable">
+                      <thead>
+                        <tr>
+                          <th>Sayur</th>
+                          <th class="num">Total Kg</th>
+                          <th class="num">Total Rp</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="h3">Detail per Tanggal + Sayur</div>
+                  <div class="tableWrap">
+                    <table id="dateVegTable">
+                      <thead>
+                        <tr>
+                          <th>Tanggal</th>
+                          <th>Sayur</th>
+                          <th>Supplier</th>
+                          <th class="num">Kg</th>
+                          <th class="num">Nominal</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- EXPORT -->
+        <section id="pageExport" class="page">
+          <div class="card">
+            <div class="h2">Export</div>
+            <div class="muted">Export bulan aktif (yang dipilih di Beranda/Input).</div>
+
+            <div class="actions" style="margin-top:12px;">
+              <button id="btnExportExcel">Export Excel</button>
+              <button id="btnExportPDF">Export PDF</button>
+            </div>
+
+            <div class="tip" style="margin-top:12px;">
+              Export akan mengambil semua data di bulan yang sedang aktif.
+            </div>
+          </div>
+        </section>
+
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
