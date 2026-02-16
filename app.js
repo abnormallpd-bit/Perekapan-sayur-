@@ -11,8 +11,8 @@
   const RATE_PER_KG = 300;
   
   // === SUPABASE ===
-  const SUPABASE_URL = "ISI_DENGAN_PROJECT_URL_LO";
-  const SUPABASE_ANON_KEY = "ISI_DENGAN_ANON_KEY_LO";
+  const SUPABASE_URL = "https://kgnojbbukjclsrvlyced.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnbm9qYmJ1a2pjbHNydmx5Y2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzAzMjYsImV4cCI6MjA4NjgwNjMyNn0.RfDO5pnGRR_s7L59y4mg9UO-2RaQ9bN_zOOx_0jU3u0";
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function dbInsertRekap(row) {
@@ -683,4 +683,5 @@ async function addRecord() {
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
 
