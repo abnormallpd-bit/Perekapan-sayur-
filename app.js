@@ -9,7 +9,17 @@
     "ifan sayur",
   ];
   const RATE_PER_KG = 300;
+  
+  // === SUPABASE ===
+  const SUPABASE_URL = "ISI_DENGAN_PROJECT_URL_LO";
+  const SUPABASE_ANON_KEY = "ISI_DENGAN_ANON_KEY_LO";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  async function dbInsertRekap(row) {
+  const { error } = await supabase.from("rekap_sayur").insert([row]);
+  if (error) throw error;
+  }
+  
   // === ADMIN PASSWORD (GANTI INI) ===
   const ADMIN_PASSWORD = "12345";
 
@@ -239,57 +249,52 @@
     return null;
   }
 
-  function addRecord() {
-    const err = validateDraftInput();
-    if (err) return alert(err);
+async function addRecord() {
+  const err = validateDraftInput();
+  if (err) return alert(err);
 
-    const ym = monthInput.value;
+  const ym = monthInput.value;
+  const kg = Number(kgOrderInput.value);
+
+  // data yang dikirim ke DB
+  const row = {
+    month: ym,
+    date: dateInput.value,
+    district: districtInput.value,
+    veg: normalizeVeg(vegInput.value),
+    supplier: supplierInput.value,
+    kg: kg,
+    rate: RATE_PER_KG,
+    nominal: kg * RATE_PER_KG
+  };
+
+  try {
+    // 1) SIMPAN KE SERVER (Supabase)
+    await dbInsertRekap(row);
+
+    // 2) (sementara) SIMPAN KE LOCAL biar tabel/dashboard langsung ke-update tanpa refactor besar
     const records = loadDraft(ym);
-
     records.push({
       id: uid(),
       month: ym,
-      date: dateInput.value,
-      veg: normalizeVeg(vegInput.value),
-      supplier: supplierInput.value,
-      district: districtInput.value,
-      kg: Number(kgOrderInput.value),
+      date: row.date,
+      veg: row.veg,
+      supplier: row.supplier,
+      district: row.district,
+      kg: row.kg,
       createdAt: new Date().toISOString(),
     });
-
     saveDraft(ym, records);
+
     vegInput.value = "";
     kgOrderInput.value = "";
     renderAll();
+
+    alert("✅ Tersimpan ke SERVER (Supabase)!");
+  } catch (e) {
+    alert("❌ Gagal simpan ke Supabase. Cek Console (F12).");
   }
-
-  function deleteDraft(id) {
-    const ym = monthInput.value;
-    const records = loadDraft(ym).filter((r) => r.id !== id);
-    saveDraft(ym, records);
-    renderAll();
-  }
-
-  function clearDraft() {
-    const ym = monthInput.value;
-    if (confirm(`Hapus draft bulan ${ym}?`)) {
-      localStorage.removeItem(keyDraft(ym));
-      renderAll();
-    }
-  }
-
-  function saveMonthFinal() {
-    const ym = monthInput.value;
-    const draft = loadDraft(ym);
-    if (draft.length === 0) return alert("Draft kosong.");
-
-    // FINAL bulan ini ditimpa agar rapi
-    saveFinal(ym, draft.map((d) => ({ ...d, month: ym })));
-    localStorage.removeItem(keyDraft(ym));
-
-    alert(`Data bulan ${ym} disimpan ke FINAL.`);
-    renderAll();
-  }
+}
 
   // ================= EDIT MODAL (DRAFT) =================
   let editingId = null;
@@ -678,3 +683,4 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
